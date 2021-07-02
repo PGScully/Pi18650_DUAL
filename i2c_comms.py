@@ -11,7 +11,6 @@ sample_delay = 0.005
 
 #BAT1_V_MON = 23
 #BAT2_V_MON = 16
-
 BAT_V_MUX = 25
 
 GPIO.setmode(GPIO.BCM)
@@ -90,7 +89,8 @@ class i2cCommand:
         global FUELGUAGE_REG_ADDR_0E  #= 0X0E #(reg name O)
         global FUELGUAGE_REG_ADDR_0F  #= 0X0F #(reg name P)
 
-        #GPIO.output(BAT1_V_MON, False)    #set both n-chan mosfets to off for multiplexing I2C clk line
+        #set both n-chan mosfets to off for multiplexing I2C clk line
+        #GPIO.output(BAT1_V_MON, False)
         #GPIO.output(BAT2_V_MON, False)
 
         return None
@@ -98,17 +98,18 @@ class i2cCommand:
     def set_fuelguage_control_reg(self, adc_mode_bit7_6, prescaler_bit5_3,
                                   al_cc_bit2_1, shutdown_bit0):
 
-        #set bit7_6-11 (0xC0) for auto mode temp and volt convertion every 1 second
-        #bit7_6-10 (0x80) for manual volt mode
-        #bit7_6-01 (0x40) for manual temp mode
-        #bit7_6-00 (0x00) for sleep mode
+        # set bit7_6-11 (0xC0) for auto mode temp and volt convertion every 1 second
+        # bit7_6-10 (0x80) for manual volt mode
+        # bit7_6-01 (0x40) for manual temp mode
+        # bit7_6-00 (0x00) for sleep mode
 
-        #leave bit5_3-111 for prescaler default 128
-        #equation 2^(4*B5 + 2*B4 + B3) ie. 2^(4*1 + 2*1 + 1) = 2^7 = 128
+        # leave bit5_3-111 for prescaler default 128
+        # equation 2^(4*B5 + 2*B4 + B3) ie. 2^(4*1 + 2*1 + 1) = 2^7 = 128
 
-        #leave bit2_1-10 for output alert mode (can connect to pin on rasp pi compute module
+        # leave bit2_1-10 for output alert mode (can connect to pin on rasp pi compute module
 
-        #leave bit0-0 as the 3V3 power will be turned off by user, but current drain will not be monitored when 3V3 off
+        # leave bit0-0 as the 3V3 power will be turned off by user, but current drain will not be
+        # monitored when 3V3 off
 
         #hardcode for now
         adc_mode_bit7_6 = 0xC0
@@ -149,10 +150,8 @@ class i2cCommand:
             print("Error No Battery Detect!!")
         '''
         print "checking fuel_gauage_control_reg value: "
-        
         (device_str_ctrl) = bus.read_byte_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_01)
-
-        print "ctrl reg: ", hex(device_str_ctrl)    
+        print "ctrl reg: ", hex(device_str_ctrl)
         '''
 
         time.sleep(0.1)
@@ -183,14 +182,9 @@ class i2cCommand:
             GPIO.output(BAT_V_MUX, 1)  #default
             GPIO.output(25, 1)  #default
 
-        #
-
         #if battery_sel == 1:
-
         #   GPIO.output(BAT_V_MUX, GPIO.LOW)    #pull mux low to select battery 1
-
         #elif battery_sel == 2:
-
         #   GPIO.output(BAT_V_MUX, GPIO.HIGH)    #pull mux high to select battery 2
 
         time.sleep(2.5)
@@ -211,7 +205,9 @@ class i2cCommand:
         temp_lsb = 0x00
 
         #all_regs = bus.read_i2c_block_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_08, 16)
-        #status, control, acc_msb, acc_lsb, chrgthhi_msb, chrgethhi_lsb, chrgthlow_msb, chrgthlow_lsb, voltage_msb, voltage_lsb, voltth_msb, voltth_lsb, temp_msb, temp_lsb, tempth_msb, tempth_lsb = all_regs
+        #status, control, acc_msb, acc_lsb, chrgthhi_msb, chrgethhi_lsb, chrgthlow_msb,
+        #  chrgthlow_lsb, voltage_msb, voltage_lsb, voltth_msb, voltth_lsb, temp_msb, temp_lsb,
+        #  tempth_msb, tempth_lsb = all_regs
         #print "all regs1: ", all_regs
 
         battery1_status_flag = 0
@@ -257,7 +253,8 @@ class i2cCommand:
         #print "voltage_msb: ", voltage_msb
         #print "voltage_lsb: ", voltage_lsb
 
-        #if (battery_sel == 1 and battery1_status_flag == 1) or (battery_sel == 2 and battery2_status_flag == 1):
+        #if (battery_sel == 1 and battery1_status_flag == 1) or
+        #   (battery_sel == 2 and battery2_status_flag == 1):
         if (battery_sel == 1) or (battery_sel == 2):
 
             voltage_16bit = float(0.0)
@@ -357,9 +354,7 @@ class i2cCommand:
             ##print("battery_capacity_percent: ", battery_capacity_percent)
 
             #temperature conversion to celcius ------------------------------------------------
-
             #print("temp_msb: ", temp_msb)
-
             #print("temp_lsb: ", temp_lsb)
 
             temperature_16bit = float(0.0)
@@ -400,7 +395,7 @@ testpoll = i2cCommand()
 
 testpoll.set_fuelguage_control_reg(0xC0, 0x80, 0x10, 0x00)
 
-while 1:
+while True:
 
     battery_capacity = 0.0
     fuel_guage_temperature = 0.0
@@ -414,9 +409,7 @@ while 1:
     testpoll.set_fuelguage_control_reg(0xC0, 0x80, 0x10, 0x00)
 
     for i in range(int(SAMPLES)):
-
-        battery_temperature = testpoll.fuelguage_check_volt(
-            1)  #1 for battery 1,
+        battery_temperature = testpoll.fuelguage_check_volt(1)  # battery 1,
         battery_capacity_temp, fuel_guage_temperature_temp, battery_voltage_temp = battery_temperature
         battery_capacity = battery_capacity + battery_capacity_temp
         fuel_guage_temperature = fuel_guage_temperature + fuel_guage_temperature_temp
@@ -447,9 +440,7 @@ while 1:
     testpoll.set_fuelguage_control_reg(0xC0, 0x80, 0x10, 0x00)
 
     for i in range(int(SAMPLES)):
-
-        battery_temperature = testpoll.fuelguage_check_volt(
-            2)  #1 for battery 2,
+        battery_temperature = testpoll.fuelguage_check_volt(2)  # battery 2,
         battery_capacity_temp, fuel_guage_temperature_temp, battery_voltage_temp = battery_temperature
         battery_capacity = battery_capacity + battery_capacity_temp
         fuel_guage_temperature = fuel_guage_temperature + fuel_guage_temperature_temp
@@ -467,9 +458,5 @@ while 1:
     print("Battery Voltage: ", battery_voltage)
     time.sleep(1.0)
     print("-----------------------------------------------")
-    print(
-        "*************************************************************************"
-    )
-    print(
-        "*************************************************************************"
-    )
+    print("*************************************************************************")
+    print("*************************************************************************")

@@ -1,0 +1,4 @@
+[style]
+based_on = pep8
+column_limit = 100
+
