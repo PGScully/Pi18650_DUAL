@@ -149,9 +149,9 @@ class i2cCommand:
         except:
             print("Error No Battery Detect!!")
         '''
-        print "checking fuel_gauage_control_reg value: "
+        print("checking fuel_gauage_control_reg value:")
         (device_str_ctrl) = bus.read_byte_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_01)
-        print "ctrl reg: ", hex(device_str_ctrl)
+        print("ctrl reg: ", hex(device_str_ctrl))
         '''
 
         time.sleep(0.1)
@@ -208,7 +208,7 @@ class i2cCommand:
         #status, control, acc_msb, acc_lsb, chrgthhi_msb, chrgethhi_lsb, chrgthlow_msb,
         #  chrgthlow_lsb, voltage_msb, voltage_lsb, voltth_msb, voltth_lsb, temp_msb, temp_lsb,
         #  tempth_msb, tempth_lsb = all_regs
-        #print "all regs1: ", all_regs
+        #print("all regs1: ", all_regs)
 
         battery1_status_flag = 0
         battery2_status_flag = 0
@@ -219,15 +219,15 @@ class i2cCommand:
                                                   FUELGUAGE_REG_ADDR_08)
             voltage_lsb = SMBus(1).read_byte_data(DEVICE_ADDR,
                                                   FUELGUAGE_REG_ADDR_09)
-            #print "voltage_msb: ", voltage_msb
-            #print "voltage_lsb: ", voltage_lsb
+            #print("voltage_msb: ", voltage_msb)
+            #print("voltage_lsb: ", voltage_lsb)
 
             temp_msb = SMBus(1).read_byte_data(DEVICE_ADDR,
                                                FUELGUAGE_REG_ADDR_0C)
             temp_lsb = SMBus(1).read_byte_data(DEVICE_ADDR,
                                                FUELGUAGE_REG_ADDR_0D)
-            #print "temp_msb: ", temp_msb
-            #print "temp_lsb: ", temp_lsb
+            #print("temp_msb: ", temp_msb)
+            #print("temp_lsb: ", temp_lsb)
 
             if battery_sel == 1:
                 battery1_status_flag = 1
@@ -236,7 +236,7 @@ class i2cCommand:
 
         except IOError as e:
 
-            print(("Could not read to battery voltage monitor: "), battery_sel)
+            print(("Could not read battery voltage monitor: "), battery_sel)
 
             if battery_sel == 1:
                 battery1_status_flag = 0
@@ -247,11 +247,11 @@ class i2cCommand:
         #voltage_msb = bus.read_byte_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_08)
         #voltage_lsb = bus.read_byte_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_09)
 
-        #print "voltage_reg_I_J: ", voltage_reg_I_J
+        #print("voltage_reg_I_J: ", voltage_reg_I_J)
         #voltage_msb, voltage_lsb = voltage_reg_I_J
 
-        #print "voltage_msb: ", voltage_msb
-        #print "voltage_lsb: ", voltage_lsb
+        #print("voltage_msb: ", voltage_msb)
+        #print("voltage_lsb: ", voltage_lsb)
 
         #if (battery_sel == 1 and battery1_status_flag == 1) or
         #   (battery_sel == 2 and battery2_status_flag == 1):
@@ -259,12 +259,12 @@ class i2cCommand:
 
             voltage_16bit = float(0.0)
             voltage_msb = voltage_msb << 8
-            #print "voltage_msb: ", hex(voltage_msb)
-            #print "voltage_lsb: ", hex(voltage_lsb)
+            #print("voltage_msb: ", hex(voltage_msb))
+            #print("voltage_lsb: ", hex(voltage_lsb))
 
             voltage_16bit = float(voltage_msb | voltage_lsb)
 
-            #print "voltage_16bit: ", voltage_16bit
+            #print("voltage_16bit: ", voltage_16bit)
 
             #voltage at battery
             battery_volt = float(0.0)
@@ -272,7 +272,7 @@ class i2cCommand:
             multiplier = float(6.0)
             battery_volt = (voltage_16bit / divisor) * multiplier
 
-            ##print "battery_volt: ", battery_volt
+            #print("battery_volt: ", battery_volt)
 
             battery_capacity_percent = 0
 
@@ -360,11 +360,11 @@ class i2cCommand:
             temperature_16bit = float(0.0)
             temp_msb = temp_msb << 8
 
-            #print "temp_msb: ", hex(temp_msb)
+            #print("temp_msb: ", hex(temp_msb))
 
             temperature_16bit = float(temp_msb | temp_lsb)
 
-            #print "temperature_16bit: ", temperature_16bit
+            #print("temperature_16bit: ", temperature_16bit)
 
             #voltage at battery
             temperature_kelvin = float(0.0)
@@ -372,13 +372,13 @@ class i2cCommand:
             temperature_kelvin = (temperature_16bit /
                                   divisor) * temperature_multiplier
 
-            ##print "temperature_kelvin: ", temperature_kelvin
+            #print("temperature_kelvin: ", temperature_kelvin)
 
             temperature_celcius = float(0.0)
 
             temperature_celcius = temperature_kelvin - 273.0
 
-            ##print "temperature_celcius: ", temperature_celcius
+            #print("temperature_celcius: ", temperature_celcius)
 
         elif (battery_sel == 1 and battery1_status_flag
               == 0) or (battery_sel == 2 and battery2_status_flag == 0):
