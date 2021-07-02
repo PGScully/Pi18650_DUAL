@@ -9,16 +9,10 @@ fuel_guage_temperature = 9.0
 battery_voltage = 0.0
 sample_delay = 0.005
 
-#BAT1_V_MON = 23
-#BAT2_V_MON = 16
 BAT_V_MUX = 25
 
 GPIO.setmode(GPIO.BCM)
-#GPIO.setmode(GPIO.BOARD)
-#GPIO.setup(BAT1_V_MON, GPIO.OUT)
-#GPIO.setup(BAT2_V_MON, GPIO.OUT)
 GPIO.setup(BAT_V_MUX, GPIO.OUT)
-#GPIO.setup(25, GPIO.OUT, initial=1)
 
 DEVICE_BUS = 1  #device bus number
 DEVICE_ADDR = 0x64
@@ -51,16 +45,14 @@ bus = smbus2.SMBus(DEVICE_BUS)
 
 
 class i2cCommand:
-    def __init__(self):
 
+    def __init__(self):
         global SAMPLES
         global battery_capacity
         global fuel_guage_temperature
         global battery_voltage
         global sample_delay
 
-        #global BAT1_V_MON
-        #global BAT2_V_MON
         global BAT_V_MUX
 
         global bus
@@ -88,10 +80,6 @@ class i2cCommand:
         global FUELGUAGE_REG_ADDR_0D  #= 0X0D #(reg name N)
         global FUELGUAGE_REG_ADDR_0E  #= 0X0E #(reg name O)
         global FUELGUAGE_REG_ADDR_0F  #= 0X0F #(reg name P)
-
-        #set both n-chan mosfets to off for multiplexing I2C clk line
-        #GPIO.output(BAT1_V_MON, False)
-        #GPIO.output(BAT2_V_MON, False)
 
         return None
 
@@ -121,113 +109,55 @@ class i2cCommand:
 
         print("set_fuel_gauage_control_reg value: ", hex(value))
 
-        #for dual fuel gauge monitors
-        '''
-        for i in range(2):
-
-            if i == 0:
-                print("Initializing Battery 1 Monitor")
-                GPIO.output(BAT1_V_MON, GPIO.HIGH)
-                GPIO.output(BAT2_V_MON, GPIO.LOW)
-            else:
-                print("Initializing Battery 2 Monitory")
-                GPIO.output(BAT1_V_MON, GPIO.LOW)
-                GPIO.output(BAT2_V_MON, GPIO.HIGH)
-            try:
-
-                bus.write_byte_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_01, value)
-            
-            except IOError as e:
-                
-                print("Could not connect to battery monitor: (set_fuelguage_control_reg) "), i
-        '''
-
         try:
-            #for single fuel gauge monitor
             bus.write_byte_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_01, value)
 
         except:
-            print("Error No Battery Detect!!")
-        '''
-        print("checking fuel_gauage_control_reg value:")
-        (device_str_ctrl) = bus.read_byte_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_01)
-        print("ctrl reg: ", hex(device_str_ctrl))
-        '''
+            print("Error No Battery Detected!")
 
         time.sleep(0.1)
 
         return 0
 
     def set_battery_mux_selection(self, battery_sel):
-
         if battery_sel == 1:
             print("Setting BAT_V_MUX: HIGH for Battery 1---->>")
 
-            #GPIO.output(BAT1_V_MON, GPIO.HIGH)
-            #GPIO.output(BAT2_V_MON, GPIO.LOW)
             GPIO.output(BAT_V_MUX, 1)
 
         elif battery_sel == 2:
             print("Setting BAT_V_MUX: LOW for Battery 2---->>")
 
-            #GPIO.output(BAT1_V_MON, GPIO.LOW)
-            #GPIO.output(BAT2_V_MON, GPIO.HIGH)
             GPIO.output(BAT_V_MUX, 0)
 
         else:
             print("Setting DEFALUT BAT_V_MUX: HIGH for Battery 1---->>")
 
-            #GPIO.output(BAT1_V_MON, GPIO.LOW)
-            #GPIO.output(BAT2_V_MON, GPIO.LOW)
             GPIO.output(BAT_V_MUX, 1)  #default
             GPIO.output(25, 1)  #default
-
-        #if battery_sel == 1:
-        #   GPIO.output(BAT_V_MUX, GPIO.LOW)    #pull mux low to select battery 1
-        #elif battery_sel == 2:
-        #   GPIO.output(BAT_V_MUX, GPIO.HIGH)    #pull mux high to select battery 2
 
         time.sleep(2.5)
 
     def fuelguage_check_volt(self, battery_sel):
 
-        #voltage is 14bit (reg's I and J) and temperature 10bit (reg's M and N)resolution
+        #voltage is 14bit (reg's I and J) and temperature 10bit (reg's M and N) resolution
         #convert I and J to 16bit variable, then (value / 65535) x 6V = Voltage
 
         #read registers I and J (8 and 9 sequentially)
-        voltage_msb_flt = float(0.0)
-        voltage_lsb_flt = float(0.0)
-        temp_msb_flt = float(0.0)
-        temp_lsb_flt = float(0.0)
         voltage_msb = 0x00
         voltage_lsb = 0x00
         temp_msb = 0x00
         temp_lsb = 0x00
 
-        #all_regs = bus.read_i2c_block_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_08, 16)
-        #status, control, acc_msb, acc_lsb, chrgthhi_msb, chrgethhi_lsb, chrgthlow_msb,
-        #  chrgthlow_lsb, voltage_msb, voltage_lsb, voltth_msb, voltth_lsb, temp_msb, temp_lsb,
-        #  tempth_msb, tempth_lsb = all_regs
-        #print("all regs1: ", all_regs)
-
         battery1_status_flag = 0
         battery2_status_flag = 0
 
         try:
+            voltage_msb = bus.read_byte_data(DEVICE_ADDR, FUELGUAGE_REG_ADDR_08)
+            voltage_lsb = bus.read_byte_data(DEVICE_ADDR, FUELGUAGE_REG_ADDR_09)
 
-            voltage_msb = SMBus(1).read_byte_data(DEVICE_ADDR,
-                                                  FUELGUAGE_REG_ADDR_08)
-            voltage_lsb = SMBus(1).read_byte_data(DEVICE_ADDR,
-                                                  FUELGUAGE_REG_ADDR_09)
-            #print("voltage_msb: ", voltage_msb)
-            #print("voltage_lsb: ", voltage_lsb)
-
-            temp_msb = SMBus(1).read_byte_data(DEVICE_ADDR,
-                                               FUELGUAGE_REG_ADDR_0C)
-            temp_lsb = SMBus(1).read_byte_data(DEVICE_ADDR,
-                                               FUELGUAGE_REG_ADDR_0D)
-            #print("temp_msb: ", temp_msb)
-            #print("temp_lsb: ", temp_lsb)
+            temp_msb = bus.read_byte_data(DEVICE_ADDR, FUELGUAGE_REG_ADDR_0C)
+            temp_lsb = bus.read_byte_data(DEVICE_ADDR, FUELGUAGE_REG_ADDR_0D)
 
             if battery_sel == 1:
                 battery1_status_flag = 1
@@ -235,44 +165,25 @@ class i2cCommand:
                 battery2_status_flag = 1
 
         except IOError as e:
-
-            print(("Could not read battery voltage monitor: "), battery_sel)
+            print("Could not read battery voltage monitor: ", battery_sel)
 
             if battery_sel == 1:
                 battery1_status_flag = 0
             else:
                 battery2_status_flag = 0
 
-        #(voltage_reg_I_J) = bus.read_i2c_block_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_08, 2)
-        #voltage_msb = bus.read_byte_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_08)
-        #voltage_lsb = bus.read_byte_data(FUELGUAGE_ADDR, FUELGUAGE_REG_ADDR_09)
-
-        #print("voltage_reg_I_J: ", voltage_reg_I_J)
-        #voltage_msb, voltage_lsb = voltage_reg_I_J
-
-        #print("voltage_msb: ", voltage_msb)
-        #print("voltage_lsb: ", voltage_lsb)
-
-        #if (battery_sel == 1 and battery1_status_flag == 1) or
-        #   (battery_sel == 2 and battery2_status_flag == 1):
-        if (battery_sel == 1) or (battery_sel == 2):
-
+        if (battery_sel == 1 and battery1_status_flag == 1) or (battery_sel == 2 and battery2_status_flag == 1):
+        # if (battery_sel == 1) or (battery_sel == 2):
             voltage_16bit = float(0.0)
             voltage_msb = voltage_msb << 8
-            #print("voltage_msb: ", hex(voltage_msb))
-            #print("voltage_lsb: ", hex(voltage_lsb))
 
             voltage_16bit = float(voltage_msb | voltage_lsb)
-
-            #print("voltage_16bit: ", voltage_16bit)
 
             #voltage at battery
             battery_volt = float(0.0)
             divisor = float(65535.0)
             multiplier = float(6.0)
             battery_volt = (voltage_16bit / divisor) * multiplier
-
-            #print("battery_volt: ", battery_volt)
 
             battery_capacity_percent = 0
 
@@ -351,38 +262,21 @@ class i2cCommand:
             else:
                 battery_capacity_percent = 0
 
-            ##print("battery_capacity_percent: ", battery_capacity_percent)
-
             #temperature conversion to celcius ------------------------------------------------
-            #print("temp_msb: ", temp_msb)
-            #print("temp_lsb: ", temp_lsb)
-
             temperature_16bit = float(0.0)
             temp_msb = temp_msb << 8
 
-            #print("temp_msb: ", hex(temp_msb))
-
             temperature_16bit = float(temp_msb | temp_lsb)
-
-            #print("temperature_16bit: ", temperature_16bit)
 
             #voltage at battery
             temperature_kelvin = float(0.0)
             temperature_multiplier = float(600.0)
-            temperature_kelvin = (temperature_16bit /
-                                  divisor) * temperature_multiplier
-
-            #print("temperature_kelvin: ", temperature_kelvin)
+            temperature_kelvin = (temperature_16bit / divisor) * temperature_multiplier
 
             temperature_celcius = float(0.0)
-
             temperature_celcius = temperature_kelvin - 273.0
 
-            #print("temperature_celcius: ", temperature_celcius)
-
-        elif (battery_sel == 1 and battery1_status_flag
-              == 0) or (battery_sel == 2 and battery2_status_flag == 0):
-
+        elif (battery_sel == 1 and battery1_status_flag == 0) or (battery_sel == 2 and battery2_status_flag == 0):
             print("No measurements available for battery: ", battery_sel)
             battery_volt = 0.0
             battery_capacity_percent = 0
@@ -422,11 +316,12 @@ while True:
 
     print("-----------------------------------------------")
     print("Battery 1:")
-    print("Battery Capacity Percent: ", battery_capacity)
-    print("Fuel Guage Temperature: ", fuel_guage_temperature)
-    print("Battery Voltage: ", battery_voltage)
-    time.sleep(1.0)
+    print("Battery Capacity Percent:", battery_capacity)
+    print("Fuel Guage Temperature:", fuel_guage_temperature)
+    print("Battery Voltage:", battery_voltage)
     print("-----------------------------------------------")
+
+    time.sleep(1.0)
 
     battery_capacity = 0.0
     fuel_guage_temperature = 0.0
@@ -453,10 +348,12 @@ while True:
 
     print("-----------------------------------------------")
     print("Battery 2:")
-    print("Battery Capacity Percent: ", battery_capacity)
-    print("Fuel Guage Temperature: ", fuel_guage_temperature)
-    print("Battery Voltage: ", battery_voltage)
-    time.sleep(1.0)
+    print("Battery Capacity Percent:", battery_capacity)
+    print("Fuel Guage Temperature:", fuel_guage_temperature)
+    print("Battery Voltage:", battery_voltage)
     print("-----------------------------------------------")
+
+    time.sleep(1.0)
+
     print("*************************************************************************")
     print("*************************************************************************")
