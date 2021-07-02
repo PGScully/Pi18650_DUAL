@@ -1,11 +1,11 @@
-import smbus
+import smbus2
 import time
-from smbus import SMBus
+from smbus2 import SMBus
 import RPi.GPIO as GPIO
 
 SAMPLES = 10.0
 battery_capacity = 0.0
-fuel_guage_temperature = 09.0
+fuel_guage_temperature = 9.0
 battery_voltage = 0.0
 sample_delay = 0.005
 
@@ -48,7 +48,7 @@ FUELGUAGE_REG_ADDR_0D = 0X0D  #temperature LSB              (R) default(XX)
 FUELGUAGE_REG_ADDR_0E = 0X0E  #temperature threshold high   (R/W) default(FF)
 FUELGUAGE_REG_ADDR_0F = 0X0F  #temperature threshold low    (R/W) default(00)
 
-bus = smbus.SMBus(DEVICE_BUS)
+bus = smbus2.SMBus(DEVICE_BUS)
 
 
 class i2cCommand:
