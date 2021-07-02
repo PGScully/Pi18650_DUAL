@@ -1,4 +1,3 @@
-import smbus2
 import time
 from smbus2 import SMBus
 import RPi.GPIO as GPIO
@@ -41,7 +40,7 @@ FUELGUAGE_REG_ADDR_0D = 0X0D  #temperature LSB              (R) default(XX)
 FUELGUAGE_REG_ADDR_0E = 0X0E  #temperature threshold high   (R/W) default(FF)
 FUELGUAGE_REG_ADDR_0F = 0X0F  #temperature threshold low    (R/W) default(00)
 
-bus = smbus2.SMBus(DEVICE_BUS)
+bus = SMBus(DEVICE_BUS)
 
 
 class i2cCommand:
