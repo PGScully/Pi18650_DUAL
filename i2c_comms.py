@@ -258,6 +258,7 @@ class i2cCommand:
 
             elif battery_volt >= 3.00:
                 battery_capacity_percent = 10
+
             else:
                 battery_capacity_percent = 0
 
@@ -286,73 +287,40 @@ class i2cCommand:
 
 testpoll = i2cCommand()
 
-testpoll.set_fuelguage_control_reg(0xC0, 0x80, 0x10, 0x00)
-
 while True:
-
-    battery_capacity = 0.0
-    fuel_guage_temperature = 0.0
-    battery_voltage = 0.0
-    battery_capacity_temp = 0.0
-    fuel_guage_temperature_temp = 0.0
-    battery_voltage_temp = 0.0
-
-    testpoll.set_battery_mux_selection(1)
-
-    testpoll.set_fuelguage_control_reg(0xC0, 0x80, 0x10, 0x00)
-
-    for i in range(int(SAMPLES)):
-        battery_temperature = testpoll.fuelguage_check_volt(1)  # battery 1,
-        battery_capacity_temp, fuel_guage_temperature_temp, battery_voltage_temp = battery_temperature
-        battery_capacity = battery_capacity + battery_capacity_temp
-        fuel_guage_temperature = fuel_guage_temperature + fuel_guage_temperature_temp
-        battery_voltage = battery_voltage + battery_voltage_temp
-        time.sleep(sample_delay)
-
-    battery_capacity = battery_capacity / SAMPLES
-    fuel_guage_temperature = fuel_guage_temperature / SAMPLES
-    battery_voltage = battery_voltage / SAMPLES
-
-    print("-----------------------------------------------")
-    print("Battery 1:")
-    print("Battery Capacity Percent:", battery_capacity)
-    print("Fuel Guage Temperature:", fuel_guage_temperature)
-    print("Battery Voltage:", battery_voltage)
-    print("-----------------------------------------------")
-
-    time.sleep(1.0)
-
-    battery_capacity = 0.0
-    fuel_guage_temperature = 0.0
-    battery_voltage = 0.0
-    battery_capacity_temp = 0.0
-    fuel_guage_temperature_temp = 0.0
-    battery_voltage_temp = 0.0
-
-    testpoll.set_battery_mux_selection(2)
-
-    testpoll.set_fuelguage_control_reg(0xC0, 0x80, 0x10, 0x00)
-
-    for i in range(int(SAMPLES)):
-        battery_temperature = testpoll.fuelguage_check_volt(2)  # battery 2,
-        battery_capacity_temp, fuel_guage_temperature_temp, battery_voltage_temp = battery_temperature
-        battery_capacity = battery_capacity + battery_capacity_temp
-        fuel_guage_temperature = fuel_guage_temperature + fuel_guage_temperature_temp
-        battery_voltage = battery_voltage + battery_voltage_temp
-        time.sleep(sample_delay)
-
-    battery_capacity = battery_capacity / SAMPLES
-    fuel_guage_temperature = fuel_guage_temperature / SAMPLES
-    battery_voltage = battery_voltage / SAMPLES
-
-    print("-----------------------------------------------")
-    print("Battery 2:")
-    print("Battery Capacity Percent:", battery_capacity)
-    print("Fuel Guage Temperature:", fuel_guage_temperature)
-    print("Battery Voltage:", battery_voltage)
-    print("-----------------------------------------------")
-
-    time.sleep(1.0)
-
     print("*************************************************************************")
+
+    for battery in [1,2]:
+        battery_capacity = 0.0
+        fuel_guage_temperature = 0.0
+        battery_voltage = 0.0
+        battery_capacity_temp = 0.0
+        fuel_guage_temperature_temp = 0.0
+        battery_voltage_temp = 0.0
+
+        testpoll.set_battery_mux_selection(battery)
+
+        testpoll.set_fuelguage_control_reg(0xC0, 0x80, 0x10, 0x00)
+
+        for i in range(int(SAMPLES)):
+            battery_temperature = testpoll.fuelguage_check_volt(battery)
+            battery_capacity_temp, fuel_guage_temperature_temp, battery_voltage_temp = battery_temperature
+            battery_capacity = battery_capacity + battery_capacity_temp
+            fuel_guage_temperature = fuel_guage_temperature + fuel_guage_temperature_temp
+            battery_voltage = battery_voltage + battery_voltage_temp
+            time.sleep(sample_delay)
+
+        battery_capacity = battery_capacity / SAMPLES
+        fuel_guage_temperature = fuel_guage_temperature / SAMPLES
+        battery_voltage = battery_voltage / SAMPLES
+
+        print("-----------------------------------------------")
+        print("Battery:", battery)
+        print("Battery Capacity Percent:", battery_capacity)
+        print("Fuel Guage Temperature:", fuel_guage_temperature)
+        print("Battery Voltage:", battery_voltage)
+        print("-----------------------------------------------")
+
+        time.sleep(1.0)
+
     print("*************************************************************************")
