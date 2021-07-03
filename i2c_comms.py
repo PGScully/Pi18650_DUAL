@@ -190,73 +190,73 @@ class i2cCommand:
             if battery_volt >= 4.20:
                 battery_capacity_percent = 100
 
-            elif battery_volt < 4.20 and battery_volt >= 4.15:
+            elif battery_volt >= 4.15:
                 battery_capacity_percent = 98
 
-            elif battery_volt < 4.15 and battery_volt >= 4.10:
+            elif battery_volt >= 4.10:
                 battery_capacity_percent = 95
 
-            elif battery_volt < 4.10 and battery_volt >= 4.00:
+            elif battery_volt >= 4.00:
                 battery_capacity_percent = 85
 
-            elif battery_volt < 4.00 and battery_volt >= 3.95:
+            elif battery_volt >= 3.95:
                 battery_capacity_percent = 75
 
-            elif battery_volt < 3.95 and battery_volt >= 3.90:
+            elif battery_volt >= 3.90:
                 battery_capacity_percent = 65
 
-            elif battery_volt < 3.90 and battery_volt >= 3.85:
+            elif battery_volt >= 3.85:
                 battery_capacity_percent = 55
 
-            elif battery_volt < 3.85 and battery_volt >= 3.80:
+            elif battery_volt >= 3.80:
                 battery_capacity_percent = 50
 
-            elif battery_volt < 3.80 and battery_volt >= 3.75:
+            elif battery_volt >= 3.75:
                 battery_capacity_percent = 48
 
-            elif battery_volt < 3.75 and battery_volt >= 3.70:
+            elif battery_volt >= 3.70:
                 battery_capacity_percent = 44
 
-            elif battery_volt < 3.70 and battery_volt >= 3.65:
+            elif battery_volt >= 3.65:
                 battery_capacity_percent = 38
 
-            elif battery_volt < 3.65 and battery_volt >= 3.60:
+            elif battery_volt >= 3.60:
                 battery_capacity_percent = 36
 
-            elif battery_volt < 3.60 and battery_volt >= 3.55:
+            elif battery_volt >= 3.55:
                 battery_capacity_percent = 34
 
-            elif battery_volt < 3.55 and battery_volt >= 3.50:
+            elif battery_volt >= 3.50:
                 battery_capacity_percent = 31
 
-            elif battery_volt < 3.50 and battery_volt >= 3.45:
+            elif battery_volt >= 3.45:
                 battery_capacity_percent = 29
 
-            elif battery_volt < 3.45 and battery_volt >= 3.40:
+            elif battery_volt >= 3.40:
                 battery_capacity_percent = 26
 
-            elif battery_volt < 3.40 and battery_volt >= 3.35:
+            elif battery_volt >= 3.35:
                 battery_capacity_percent = 24
 
-            elif battery_volt < 3.35 and battery_volt >= 3.30:
+            elif battery_volt >= 3.30:
                 battery_capacity_percent = 23
 
-            elif battery_volt < 3.30 and battery_volt >= 3.25:
+            elif battery_volt >= 3.25:
                 battery_capacity_percent = 21
 
-            elif battery_volt < 3.25 and battery_volt >= 3.20:
+            elif battery_volt >= 3.20:
                 battery_capacity_percent = 18
 
-            elif battery_volt < 3.20 and battery_volt >= 3.15:
+            elif battery_volt >= 3.15:
                 battery_capacity_percent = 16
 
-            elif battery_volt < 3.15 and battery_volt >= 3.10:
+            elif battery_volt >= 3.10:
                 battery_capacity_percent = 15
 
-            elif battery_volt < 3.10 and battery_volt >= 3.05:
+            elif battery_volt >= 3.05:
                 battery_capacity_percent = 11
 
-            elif battery_volt < 3.05 and battery_volt >= 3.00:
+            elif battery_volt >= 3.00:
                 battery_capacity_percent = 10
             else:
                 battery_capacity_percent = 0
