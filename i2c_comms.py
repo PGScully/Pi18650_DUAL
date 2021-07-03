@@ -130,7 +130,7 @@ class i2cCommand:
             GPIO.output(BAT_V_MUX, 0)
 
         else:
-            print("Setting DEFALUT BAT_V_MUX: HIGH for Battery 1---->>")
+            print("Setting DEFAULT BAT_V_MUX: HIGH for Battery 1---->>")
 
             GPIO.output(BAT_V_MUX, 1)  #default
             GPIO.output(25, 1)  #default
